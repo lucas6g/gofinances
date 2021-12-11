@@ -3,6 +3,7 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Feather } from '@expo/vector-icons';
 import { FlatList } from 'react-native'
 import { BorderlessButton } from "react-native-gesture-handler";
+import { Transaction } from './Dashboard'
 
 export const Container = styled.View`
     background-color: ${({ theme }) => theme.colors.background};
@@ -91,7 +92,14 @@ export const Title = styled.Text`
 
 `
 
-export const TrasanctionsList = styled(FlatList)`
+export const TrasanctionsList = styled(FlatList as new () => FlatList<Transaction>)`
 
+
+`
+
+export const LoadingContainer = styled.View`
+flex: 1;
+    justify-content: center;
+    align-items: center;
 
 `

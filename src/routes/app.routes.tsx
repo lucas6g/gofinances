@@ -7,6 +7,7 @@ import { Platform } from 'react-native'
 import { Dashboard } from '../screens/Dashboard/Dashboard'
 import { Register } from '../screens/Register/Register'
 import { useTheme } from 'styled-components'
+import { Resume } from '../screens/Resume/Resume'
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
@@ -76,7 +77,7 @@ export function AppRoutes() {
                         )
                     }
                 }}
-                component={Register}
+                component={Resume}
             />
         </Navigator>
     )

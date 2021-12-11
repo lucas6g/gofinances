@@ -36,10 +36,10 @@ export function TrasactionCard({ amaunt, category, date, title, type }: Trasacti
             <Title>{title}</Title>
 
             {
-                type === "outcome" ? (
+                type === "outcome" ?
                     <Amaunt type={type}> - {amaunt}</Amaunt>
 
-                ) : <Amaunt type={type}>{amaunt}</Amaunt>
+                    : <Amaunt type={type}>{amaunt}</Amaunt>
 
             }
 

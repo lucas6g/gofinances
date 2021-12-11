@@ -33,8 +33,6 @@ interface CategorySelectProps {
 export function CategorySelect({ category, closeSelectCategory, setCategory }: CategorySelectProps) {
 
 
-
-
     function handleSetCategory(category: Category) {
         setCategory(category)
 

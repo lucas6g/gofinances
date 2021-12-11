@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import React from 'react'
 
 import { Button } from '../../components/Forms/Button/Button'
@@ -16,6 +16,15 @@ import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 
 import { yupResolver } from '@hookform/resolvers/yup'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import uuid from 'react-native-uuid'
+
+import { useNavigation } from '@react-navigation/native'
+import { AuthContext } from '../../context/AuthContext'
+
+
+
 
 
 
@@ -23,6 +32,22 @@ import { yupResolver } from '@hookform/resolvers/yup'
 interface FormData {
     name: string
     amount: string
+}
+
+
+interface Transaction {
+    id: string
+    title: string
+    amount: string
+    date: string
+    categoryKey: string
+    type: 'income' | 'outcome'
+
+
+}
+
+type NavigationProps = {
+    navigate: (screen: string) => void;
 }
 
 const validation = Yup.object().shape({
@@ -33,14 +58,23 @@ const validation = Yup.object().shape({
 
 
 export function Register() {
-    const [trasactionType, setTrasactionType] = useState('')
+    const [trasactionType, setTrasactionType] = useState<'income' | 'outcome' | ''>('')
     const [isSelectModalOpen, setIsSelectModalOpen] = useState(false)
 
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const { user } = useContext(AuthContext)
+
+    const { control, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(validation)
     })
 
 
+
+    const collectionKey = `@gofinances:transactions_user:${user.id}`
+
+
+
+
+    const navigation = useNavigation<NavigationProps>()
 
     const [category, setCategory] = useState({
         key: 'category',
@@ -49,7 +83,9 @@ export function Register() {
     })
 
 
-    function handleRegister(data: FormData) {
+
+
+    async function handleRegister(data: FormData) {
 
         if (!trasactionType) {
             return Alert.alert('Seleciona um tipo aii')
@@ -61,21 +97,52 @@ export function Register() {
 
 
         const transaction = {
-            ...data,
-            trasactionType,
-            category: category.key
+            id: String(uuid.v4()),
+            title: data.name,
+            amount: data.amount,
+            type: trasactionType,
+            categoryKey: category.key,
+            date: String(new Date()),
 
         }
-        console.log(transaction)
+
+
+        try {
+            const currentTransactions = await AsyncStorage.getItem(collectionKey)
+
+            if (currentTransactions) {
+                const trasactions: Transaction[] = JSON.parse(currentTransactions)
+                trasactions.push(transaction)
+                await AsyncStorage.setItem(collectionKey, JSON.stringify(trasactions))
+            } else {
+
+                await AsyncStorage.setItem(collectionKey, JSON.stringify([transaction]))
+            }
+
+
+            setCategory({
+                key: 'category',
+                name: 'Categoria',
+
+            })
+            setTrasactionType('')
+            reset()
+
+            navigation.navigate('Listagem')
+
+        } catch (error) {
+            console.log(error)
+            Alert.alert("Não foi possivel  Salvar ")
+        }
 
     }
 
-    function handleIsSelected(type: string) {
+    function handleIsSelected(type: 'income' | 'outcome') {
         if (type === 'income') {
-            setTrasactionType('income')
+            setTrasactionType("income")
         } else {
 
-            setTrasactionType('outcome')
+            setTrasactionType("outcome")
 
         }
 
